@@ -9,18 +9,18 @@
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
     <script>
-        function checkCaptcha() {
-            var response = grecaptcha.getResponse();
+        function onCaptchaSuccess(token) {
+            console.log("✅ CAPTCHA Completed! Token: " + token);
 
-            if (response.length === 0) {
-                alert("Please complete the CAPTCHA.");
+            if (window.Unity && window.Unity.call) {
+                window.Unity.call(token);
+                console.log("📩 Sent CAPTCHA token to Unity!");
+            } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.unity) {
+                window.webkit.messageHandlers.unity.postMessage(token);
+                console.log("📩 Sent CAPTCHA token to Unity WebView on iOS!");
             } else {
-                // Send response token to Unity WebView
-                if (window.Unity && window.Unity.call) {
-                    window.Unity.call(response);
-                } else {
-                    alert("Unity WebView not detected. Captcha response: " + response);
-                }
+                alert("⚠️ Unity WebView not detected. CAPTCHA response: " + token);
+                console.log("⚠️ Unity WebView not detected. CAPTCHA response: " + token);
             }
         }
     </script>
@@ -44,36 +44,19 @@
             max-width: 400px;
             padding: 20px;
             background-color: white;
-            border-radius: 10px;
+            border-radius: 15px; /* Rounded corners */
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
             text-align: center;
-        }
-
-        button {
-            margin-top: 15px;
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <div class="recaptcha-container">
-        <form>
-            <div class="g-recaptcha" 
-                 data-sitekey="6LfTWcYqAAAAAO720aDEISXBcISrHYRopT3Hj26V"
-                 data-size="normal">
-            </div>
-            <button type="button" onclick="checkCaptcha()">Submit CAPTCHA</button>
-        </form>
+        <div class="g-recaptcha" 
+             data-sitekey="6LfTWcYqAAAAAO720aDEISXBcISXBcISrHYRopT3Hj26V"
+             data-callback="onCaptchaSuccess" 
+             data-size="normal">
+        </div>
     </div>
 </body>
 </html>
