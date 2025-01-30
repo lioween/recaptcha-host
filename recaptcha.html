@@ -11,6 +11,9 @@
                 if (window.Unity && window.Unity.call) {
                     console.log("📩 Sending token to Unity WebView:", token);
                     window.Unity.call("captchaResponse:" + token);
+                } else if (window.unityInstance && window.unityInstance.SendMessage) {
+                    console.log("📩 Sending token via unityInstance:", token);
+                    window.unityInstance.SendMessage("GameObjectName", "MethodName", token);
                 } else {
                     console.warn("⚠️ Unity WebView not available! Using fallback...");
                     alert("CAPTCHA Token (testing): " + token);
@@ -21,17 +24,46 @@
             }
         }
 
+        async function verifyTokenWithServer(token) {
+            console.log("🔍 Verifying token with backend...");
+            
+            try {
+                let response = await fetch("https://your-backend.com/verify-captcha", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token: token })
+                });
+
+                let data = await response.json();
+                console.log("🖥️ Server response:", data);
+
+                if (data.success) {
+                    sendTokenToUnity(token);
+                } else {
+                    console.error("❌ CAPTCHA verification failed:", data);
+                    alert("CAPTCHA verification failed. Please try again.");
+                }
+            } catch (error) {
+                console.error("❌ Error verifying token:", error);
+                alert("Error verifying CAPTCHA. Please check your internet connection.");
+            }
+        }
+
         function checkCaptcha() {
             var token = grecaptcha.getResponse();
             console.log("🔄 Checking reCAPTCHA response:", token);
 
             if (token) {
-                sendTokenToUnity(token);
+                verifyTokenWithServer(token); // Ensure token is valid before sending to Unity
             } else {
                 console.error("❌ No CAPTCHA response received.");
                 alert("Please complete the CAPTCHA first.");
             }
         }
+
+        window.onload = function () {
+            console.log("📌 reCAPTCHA script loaded successfully.");
+        };
     </script>
     <style>
         body {
