@@ -7,13 +7,17 @@
         function sendTokenToUnity(token) {
             console.log("✅ CAPTCHA Verified! Token:", token);
 
-            if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
-                window.ReactNativeWebView.postMessage("captchaResponse:" + token);
-                console.log("📩 Token Sent to Unity WebView:", token);
-            } else {
-                console.warn("⚠️ Unity WebView not available! Using fallback...");
-                alert("CAPTCHA Token (for testing): " + token);
-                window.location.href = "https://your-fallback-url.com?token=" + token;
+            try {
+                if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+                    console.log("📩 Sending token to Unity WebView:", token);
+                    window.ReactNativeWebView.postMessage("captchaResponse:" + token);
+                } else {
+                    console.warn("⚠️ Unity WebView not available! Using fallback...");
+                    alert("CAPTCHA Token (testing): " + token);
+                    window.location.href = "https://your-fallback-url.com?token=" + token; // Debug fallback
+                }
+            } catch (error) {
+                console.error("❌ Error sending message to Unity WebView:", error);
             }
         }
 
