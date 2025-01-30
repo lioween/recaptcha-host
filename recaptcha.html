@@ -5,31 +5,66 @@
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script>
         function sendTokenToUnity(token) {
-            window.location.href = "captchaResponse:" + token;
+            console.log("✅ CAPTCHA Verified! Token:", token);
+
+            if (window.ReactNativeWebView) {
+                window.ReactNativeWebView.postMessage("captchaResponse:" + token);
+                console.log("📩 Token Sent to Unity WebView:", token);
+            } else {
+                console.warn("⚠️ Unity WebView not available! Logging instead.");
+                alert("CAPTCHA Token: " + token);
+            }
+        }
+
+        function checkCaptcha() {
+            var token = grecaptcha.getResponse();
+            console.log("🔄 Checking reCAPTCHA response:", token);
+
+            if (token) {
+                sendTokenToUnity(token);
+            } else {
+                console.error("❌ No CAPTCHA response received.");
+                alert("Please complete the CAPTCHA first.");
+            }
         }
     </script>
     <style>
-        /* Make the body full-screen and center everything */
         body {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh; /* 100% viewport height */
+            height: 100vh;
             margin: 0;
-            background-color: #f8f9fa; /* Light background */
+            background-color: #f8f9fa;
         }
 
-        /* Center and enlarge the reCAPTCHA box */
         .recaptcha-container {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             width: 100%;
-            max-width: 400px; /* Ensures it doesn't get too big */
+            max-width: 400px;
             padding: 20px;
             background-color: white;
             border-radius: 10px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -41,6 +76,7 @@
                  data-callback="sendTokenToUnity" 
                  data-size="normal">
             </div>
+            <button type="button" onclick="checkCaptcha()">Submit CAPTCHA</button>
         </form>
     </div>
 </body>
