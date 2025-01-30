@@ -10,63 +10,19 @@
 
     <script>
         function checkCaptcha() {
-            var token = grecaptcha.getResponse();
-            console.log("🔄 Checking reCAPTCHA response:", token);
+            var response = grecaptcha.getResponse();
 
-            if (token) {
-                verifyTokenWithServer(token); // Ensure token is valid before sending to Unity
+            if (response.length === 0) {
+                alert("Please complete the CAPTCHA.");
             } else {
-                console.error("❌ No CAPTCHA response received.");
-                alert("Please complete the CAPTCHA first.");
-            }
-        }
-
-        async function verifyTokenWithServer(token) {
-            console.log("🔍 Sending token to backend for verification...");
-
-            try {
-                let response = await fetch("https://your-backend.com/verify-captcha", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token: token })
-                });
-
-                let data = await response.json();
-                console.log("🖥️ Server response:", data);
-
-                if (data.success) {
-                    sendTokenToUnity(token);
-                } else {
-                    console.error("❌ CAPTCHA verification failed:", data);
-                    alert("CAPTCHA verification failed. Please try again.");
-                }
-            } catch (error) {
-                console.error("❌ Error verifying token:", error);
-                alert("Error verifying CAPTCHA. Check your internet connection.");
-            }
-        }
-
-        function sendTokenToUnity(token) {
-            console.log("📩 Sending token to Unity:", token);
-
-            try {
+                // Send response token to Unity WebView
                 if (window.Unity && window.Unity.call) {
-                    window.Unity.call("captchaResponse:" + token);
-                } else if (window.unityInstance && window.unityInstance.SendMessage) {
-                    window.unityInstance.SendMessage("RecaptchaManager", "OnRecaptchaSuccess", token);
+                    window.Unity.call(response);
                 } else {
-                    console.warn("⚠️ Unity WebView not available! Using fallback...");
-                    alert("CAPTCHA Token (testing): " + token);
-                    window.location.href = "https://your-fallback-url.com?token=" + encodeURIComponent(token);
+                    alert("Unity WebView not detected. Captcha response: " + response);
                 }
-            } catch (error) {
-                console.error("❌ Error sending message to Unity:", error);
             }
         }
-
-        window.onload = function () {
-            console.log("📌 reCAPTCHA v2 script loaded successfully.");
-        };
     </script>
 
     <style>
