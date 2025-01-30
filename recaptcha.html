@@ -1,16 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script>
         function sendTokenToUnity(token) {
             window.location.href = "captchaResponse:" + token;
         }
     </script>
+    <style>
+        /* Make the body full-screen and center everything */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* 100% viewport height */
+            margin: 0;
+            background-color: #f8f9fa; /* Light background */
+        }
+
+        /* Center and enlarge the reCAPTCHA box */
+        .recaptcha-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 400px; /* Ensures it doesn't get too big */
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </head>
 <body>
-    <form>
-        <div class="g-recaptcha" data-sitekey="6LfTWcYqAAAAAO720aDEISXBcISrHYRopT3Hj26V" data-callback="sendTokenToUnity"></div>
-    </form>
+    <div class="recaptcha-container">
+        <form>
+            <div class="g-recaptcha" 
+                 data-sitekey="6LfTWcYqAAAAAO720aDEISXBcISrHYRopT3Hj26V" 
+                 data-callback="sendTokenToUnity" 
+                 data-size="normal">
+            </div>
+        </form>
+    </div>
 </body>
 </html>
